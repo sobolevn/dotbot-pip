@@ -1,0 +1,6 @@
+- pip:
+    file: requirements.txt
+    binary: /usr/local/bin/pip3
+
+- pipsi:
+    file: requirements-pipsi.txt
