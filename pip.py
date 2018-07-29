@@ -95,9 +95,12 @@ class Brew(dotbot.Plugin):
     def _handle_install(self, directive, data):
         binary = self._get_binary(directive, data)
         requirements = self._prepare_requirements(directive, data)
+        param = ''
+        if directive != self._pipsi_directive:
+            param = '--user'
 
         for req in requirements:
-            command = '{} install {}'.format(binary, req)
+            command = '{} install {} {}'.format(binary, param, req)
 
             with open(os.devnull, 'w') as devnull:
                 result = subprocess.call(
