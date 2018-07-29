@@ -8,6 +8,11 @@ class Brew(dotbot.Plugin):
     _pipsi_directive = 'pipsi'
     _default_binary = 'pip'
 
+    # Default outputs
+    _default_stdout = False
+    _default_stderr = False
+    _use_user_directory = False
+
     _supported_directives = [
         'pip',  # it is not the same as default binary.
         _pipsi_directive,
@@ -89,23 +94,41 @@ class Brew(dotbot.Plugin):
             '-r {}'.format(data['file']),
         ]
 
+    def _get_parameters(self, data):
+        """
+        Prepare the optional parameters
+            :param self:
+            :param data:
+        """
+        parameters = {
+            'stdout': data.get('stdout', self._default_stdout),
+            'stderr': data.get('stderr', self._default_stderr),
+            'user_directory': data.get('user', self._use_user_directory)
+        }
+        return parameters
 
     # Handlers
 
     def _handle_install(self, directive, data):
         binary = self._get_binary(directive, data)
         requirements = self._prepare_requirements(directive, data)
+        parameters = self._get_parameters(data)
+        is_pip = (directive != self._pipsi_directive)
+
+        param = ''
+        if parameters['user_directory'] and is_pip:
+            param = '--user'
 
         for req in requirements:
-            command = '{} install {}'.format(binary, req)
+            command = '{} install {} {}'.format(binary, param, req)
 
             with open(os.devnull, 'w') as devnull:
                 result = subprocess.call(
                     command,
                     shell=True,
                     stdin=devnull,
-                    stdout=devnull,
-                    stderr=devnull,
+                    stdout=True if parameters["stdout"] else devnull ,
+                    stderr=True if parameters['stderr'] else devnull,
                     cwd=self.cwd,
                 )
 
