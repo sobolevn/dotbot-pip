@@ -33,11 +33,16 @@ git submodule add https://github.com/sobolevn/dotbot-pip.git
 - pip:
     file: requirements.txt
     binary: /usr/local/bin/pip3
+    user: true    # Like --user
+    stdout: false # Print the execution stdout
+    stderr: true  # Print the execution stderr
 
 # Also supports pipsi, make sure it appears after `pip`!
 
 - pipsi:
     file: requirements-pipsi.txt
+    stdout: false # Print the execution stdout
+    stderr: true  # Print the execution stderr
 ```
 
 That's it!
