@@ -5,6 +5,7 @@ import dotbot
 
 
 class Brew(dotbot.Plugin):
+    _pipx_directive = 'pipx'
     _pipsi_directive = 'pipsi'
     _default_binary = 'pip'
 
@@ -16,6 +17,7 @@ class Brew(dotbot.Plugin):
     _supported_directives = [
         'pip',  # it is not the same as default binary.
         _pipsi_directive,
+        _pipx_directive,
     ]
 
     # API methods
@@ -64,8 +66,8 @@ class Brew(dotbot.Plugin):
         Respects `binary` key for `pip`.
         Returns just `pipsi` for `pipsi`.
         """
-        if directive == self._pipsi_directive:
-            return self._pipsi_directive
+        if directive in [self._pipsi_directive, self._pipx_directive]:
+            return directive
 
         return data.get('binary', self._default_binary)
 
@@ -79,20 +81,17 @@ class Brew(dotbot.Plugin):
 
         And just return the file path with `-r` for `pip`.
         """
-        if directive == self._pipsi_directive:
+        if directive in [self._pipsi_directive, self._pipx_directive]:
             with open(os.path.join(self.cwd, data['file'])) as r:
                 requirements = r.readlines()
 
             requirements = filter(
-                lambda x: x != '\n' and not x.startswith('#'),
-                requirements
+                lambda x: x != '\n' and not x.startswith('#'), requirements
             )
             return requirements
 
         # Just `pip`:
-        return [
-            '-r {}'.format(data['file']),
-        ]
+        return ['-r {}'.format(data['file'])]
 
     def _get_parameters(self, data):
         """
@@ -103,7 +102,7 @@ class Brew(dotbot.Plugin):
         parameters = {
             'stdout': data.get('stdout', self._default_stdout),
             'stderr': data.get('stderr', self._default_stderr),
-            'user_directory': data.get('user', self._use_user_directory)
+            'user_directory': data.get('user', self._use_user_directory),
         }
         return parameters
 
@@ -113,7 +112,7 @@ class Brew(dotbot.Plugin):
         binary = self._get_binary(directive, data)
         requirements = self._prepare_requirements(directive, data)
         parameters = self._get_parameters(data)
-        is_pip = (directive != self._pipsi_directive)
+        is_pip = directive == 'pip'
 
         param = ''
         if parameters['user_directory'] and is_pip:
@@ -127,11 +126,10 @@ class Brew(dotbot.Plugin):
                     command,
                     shell=True,
                     stdin=devnull,
-                    stdout=True if parameters["stdout"] else devnull ,
+                    stdout=True if parameters["stdout"] else devnull,
                     stderr=True if parameters['stderr'] else devnull,
                     cwd=self.cwd,
                 )
 
                 if result not in [0, 1]:
                     raise ValueError('Failed to install requirements.')
-
