@@ -8,3 +8,7 @@
     file: requirements-pipsi.txt
     stdout: true
     stderr: false
+- pipx:
+    file: requirements-pipx.txt
+    stdout: true
+    stderr: false

@@ -1,6 +1,6 @@
 # dotbot-pip
 
-Install `pip` packages with `dotbot`. Also supports `pipsi`.
+Install `pip` packages with `dotbot`. Also supports `pipsi` and `pipx`.
 
 
 ## Prerequirements
@@ -37,12 +37,17 @@ git submodule add https://github.com/sobolevn/dotbot-pip.git
     stdout: false # Print the execution stdout
     stderr: true  # Print the execution stderr
 
-# Also supports pipsi, make sure it appears after `pip`!
+# Also supports pipsi and pipx, make sure they appear after `pip`!
 
 - pipsi:
     file: requirements-pipsi.txt
     stdout: false # Print the execution stdout
     stderr: true  # Print the execution stderr
+
+- pipx:
+    file: requirements-pipx.txt
+    stdout: false
+    stderr: true
 ```
 
 That's it!
