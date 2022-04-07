@@ -62,14 +62,11 @@ class Brew(dotbot.Plugin):
     def _get_binary(self, directive, data):
         """
         Return correct binary path.
-
-        Respects `binary` key for `pip`.
-        Returns just `pipsi` for `pipsi`.
         """
-        if directive in [self._pipsi_directive, self._pipx_directive]:
-            return directive
+        if data.get('binary', False):
+            return data.get('binary')
 
-        return data.get('binary', self._default_binary)
+        return directive
 
     def _prepare_requirements(self, directive, data):
         """
