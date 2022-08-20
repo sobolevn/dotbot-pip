@@ -50,14 +50,22 @@ class Brew(dotbot.Plugin):
         return data
 
     def _do_requirements_exist(self, data):
-        message = 'Requirements file does not exist.'
-        filename = data.get('file')
-        if not filename:
-            raise ValueError(message)
+        """
+        Verifies requirement file exists, and resolves full path
+        """
+        path = data.get('file')
+        if not path:
+            raise ValueError('No requirements file specified')
 
-        path = os.path.join(self.cwd, filename)
+        message = 'Requirements file "{}" does not exist'.format(path)
+        path = os.path.expandvars(path)
+        path = os.path.expanduser(path)
+        path = os.path.join(self.cwd, path)
+
         if not os.path.isfile(path):
             raise ValueError(message)
+
+        data['file'] = path
 
     def _get_binary(self, directive, data):
         """
